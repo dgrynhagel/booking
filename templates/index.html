@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Space ID</th>
+                <th>Token</th>
+                <th id="removeHeader" style="display:none;">Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows to display existing records -->
+            {% for record in records %}
+            <tr>
+                <td>{{ record.email }}</td>
+                <td>{{ record.space_id }}</td>
+                <td>
+                    <input type="text" name="token" value="{{ record.token }}" id="token{{ loop.index }}">
+                    <button type="button" onclick="updateToken('{{ record.email }}', '{{ record.space_id }}', document.getElementById('token{{ loop.index }}').value)">Edit</button>
+                </td>
+                <td id="removeButton{{ loop.index }}" style="display:none;">
+                    <button type="button" onclick="removeRecord('{{ record.email }}', '{{ record.space_id }}')">Remove</button>
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- Last row for adding new record -->
+            <tr>
+                <td><input type="text" name="email"></td>
+                <td><input type="text" name="space_id"></td>
+                <td><input type="text" name="token"></td>
+                <td><button type="button" onclick="submitForm()">Submit</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function submitForm() {
+            var email = document.querySelector("input[name='email']").value;
+            var space_id = document.querySelector("input[name='space_id']").value;
+            var token = document.querySelector("input[name='token']").value;
+
+            var data = {
+                email: email,
+                space_id: space_id,
+                token: token
+            };
+
+            fetch('/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Handle response if needed
+                window.location.reload(); // Refresh page after saving
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateToken(email, space_id, token) {
+            var data = {
+                email: email,
+                space_id: space_id,
+                token: token
+            };
+
+            fetch('/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Handle response if needed
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function removeRecord(email, space_id) {
+            var filename = email + '_' + space_id + '.json';
+            fetch('/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({filename: filename})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Handle response if needed
+                window.location.reload(); // Refresh page after removing
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function removable() {
+            var removeButtons = document.querySelectorAll('[id^="removeButton"]');
+            var removeHeader = document.getElementById('removeHeader');
+            if (removeButtons && removeButtons.length > 0) {
+                if (removeButtons[0].style.display === "none") {
+                    removeHeader.style.display = "table-cell";
+                    for (var i = 0; i < removeButtons.length; i++) {
+                        removeButtons[i].style.display = "table-cell";
+                    }
+                } else {
+                    removeHeader.style.display = "none";
+                    for (var i = 0; i < removeButtons.length; i++) {
+                        removeButtons[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
