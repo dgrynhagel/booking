@@ -1,20 +1,29 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import os
 import json
 import schedule
 import threading
 import time
-from subprocess import Popen
+import subprocess
 
+port = 7171
 app = Flask(__name__)
 
 DATA_DIR = "data"
-MAX_RECORDS = 20
+MAX_RECORDS = 5
 
 # Define the function to execute booking.py for each JSON file
 def execute_booking_script(email, refresh_token, space_id, data_path):
-    script_path = os.path.join(os.path.dirname(__file__), "booking.py")
-    Popen(["python", script_path, email, refresh_token, space_id, data_path])
+    script_path = os.path.join(os.path.dirname(__file__), "additional/booking.py")
+    process = subprocess.Popen(["python", script_path, email, refresh_token, space_id, data_path],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+
+    time.sleep(0.5)
+    stdout, stderr = process.communicate()
+    print("Output:", stdout.decode())
+    print("Errors:", stderr.decode())
+
 
 # Schedule the execution of booking.py for each JSON file once a day at 00:01
 def read_and_process_files():
@@ -34,15 +43,20 @@ def read_and_process_files():
 def schedule_file_reading_and_booking_process():
     schedule.every().day.at("00:01").do(read_and_process_files)
 
+
 # Run the scheduled jobs in a separate thread
 def run_scheduler():
+    schedule_file_reading_and_booking_process()
     while True:
         schedule.run_pending()
         time.sleep(1)
 
+
 # Start the scheduler in a separate thread
 scheduler_thread = threading.Thread(target=run_scheduler)
+scheduler_thread.daemon = True
 scheduler_thread.start()
+
 
 # Your Flask routes and functions below
 
@@ -61,6 +75,7 @@ def save_data(data):
         f.write(json.dumps(data))
     return jsonify({'message': 'Data saved successfully'})
 
+
 def update_data(data):
     email = data.get('email')
     space_id = data.get('space_id')
@@ -74,6 +89,7 @@ def update_data(data):
             f.write(json.dumps(data))
         return jsonify({'message': 'Data updated successfully'})
     return jsonify({'error': 'Record not found'}), 404
+
 
 @app.route('/')
 def index():
@@ -89,11 +105,13 @@ def index():
 
     return render_template('index.html', records=records)
 
+
 @app.route('/save', methods=['POST'])
 def save_record():
     if request.method == 'POST':
         data = request.get_json()
         return save_data(data)
+
 
 @app.route('/update', methods=['POST'])
 def update_record():
@@ -101,10 +119,11 @@ def update_record():
         data = request.get_json()
         return update_data(data)
 
+
 @app.route('/remove', methods=['POST'])
 def remove_record():
     if request.method == 'POST':
-        filename = request.form.get('filename')
+        filename = request.get_json().get('filename')
         filepath = os.path.join(DATA_DIR, filename)
         if os.path.exists(filepath):
             os.remove(filepath)
@@ -112,10 +131,20 @@ def remove_record():
         else:
             return jsonify({'error': 'Record not found'}), 404
 
+@app.route('/source')
+def download_source():
+    try:
+        return send_file('additional/source.zip', as_attachment=True)
+    except Exception as e:
+        return str(e)
 
-
+@app.route('/program')
+def download_program():
+    try:
+        return send_file('additional/booking-tool.zip', as_attachment=True)
+    except Exception as e:
+        return str(e)
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=port)

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import urllib.request
 import json
 
+
 def obtain_auth_token(refresh_token):
     url = 'https://fiserv.serraview.com/api/v1/phoenix/auth/refresh'
     headers = {
@@ -35,8 +36,16 @@ def obtain_auth_token(refresh_token):
         print(e.reason)
         return None, None
 
+
 def process_booking(email, auth_token, space_id):
-    start_date = datetime.utcnow()  # Example: Use current date and time
+    start_date = datetime.now() + timedelta(days=83, hours=8)  # Example: Use current date and time
+    excluded_days = [False, False, False, False, False, True, True]
+
+    def is_excluded_day(day):
+        return excluded_days[day]
+
+    if is_excluded_day(start_date.weekday()):
+        return
 
     url = f'https://fiserv.serraview.com/engage_api/v1/spaces/{space_id}/book'
     headers = {
@@ -59,7 +68,7 @@ def process_booking(email, auth_token, space_id):
         return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     start_time_utc = start_date.astimezone(timezone.utc)
-    end_time_utc = (start_date + timedelta(hours=1)).astimezone(timezone.utc)  # Example: 1 hour booking
+    end_time_utc = (start_date + timedelta(hours=10)).astimezone(timezone.utc)
 
     data = {
         'start': iso_format(start_time_utc),
@@ -80,6 +89,7 @@ def process_booking(email, auth_token, space_id):
         print(f"Failed to book for space ID {space_id}. Error code: {e.code}")
         print(e.reason)
 
+
 def update_refresh_token_in_file(file_path, new_refresh_token):
     with open(file_path, 'r+') as file:
         data = json.load(file)
@@ -87,6 +97,7 @@ def update_refresh_token_in_file(file_path, new_refresh_token):
         file.seek(0)
         json.dump(data, file, indent=4)
         file.truncate()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
