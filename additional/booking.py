@@ -3,8 +3,13 @@ from datetime import datetime, timedelta, timezone
 import urllib.request
 import json
 
+logs_dir = './logs.txt'
 
-def obtain_auth_token(refresh_token):
+def write_to_log(text):
+    with open(logs_dir, 'a') as file:
+        file.write(f"{text}\n")
+
+def obtain_auth_token(refresh_token, email):
     url = 'https://fiserv.serraview.com/api/v1/phoenix/auth/refresh'
     headers = {
         'Accept': 'application/json',
@@ -30,21 +35,24 @@ def obtain_auth_token(refresh_token):
         with urllib.request.urlopen(req) as response:
             response_data = response.read().decode('utf-8')
             json_response = json.loads(response_data)
+            write_to_log(f"Refresh token for account {email} succeed")
             return json_response['token'], json_response['refreshToken']
     except urllib.error.HTTPError as e:
         print(f"Error code: {e.code}")
+        write_to_log(f"Refresh token for account {email} failed - please provide new one")
         print(e.reason)
         return None, None
 
 
 def process_booking(email, auth_token, space_id):
-    start_date = datetime.now() + timedelta(days=83, hours=8)  # Example: Use current date and time
+    start_date = datetime.now() + timedelta(days=82, hours=8)  # Example: Use current date and time
     excluded_days = [False, False, False, False, False, True, True]
 
     def is_excluded_day(day):
         return excluded_days[day]
 
     if is_excluded_day(start_date.weekday()):
+        write_to_log(f"Booking skipped (weekend) for space ID {space_id} - {email}")
         return
 
     url = f'https://fiserv.serraview.com/engage_api/v1/spaces/{space_id}/book'
@@ -85,8 +93,10 @@ def process_booking(email, auth_token, space_id):
     try:
         with urllib.request.urlopen(req) as response:
             print(f"Booking successful for space ID {space_id}.")
+            write_to_log(f"Booking successful for space ID {space_id} - {email}")
     except urllib.error.HTTPError as e:
         print(f"Failed to book for space ID {space_id}. Error code: {e.code}")
+        write_to_log(f"Booking failure for space ID {space_id} - {email}")
         print(e.reason)
 
 
@@ -108,8 +118,9 @@ if __name__ == "__main__":
     refresh_token = sys.argv[2]
     space_id = sys.argv[3]
     file_path = sys.argv[4]
+    write_to_log("")
 
-    auth_token, new_refresh_token = obtain_auth_token(refresh_token)
+    auth_token, new_refresh_token = obtain_auth_token(refresh_token, email)
     if auth_token:
         process_booking(email, auth_token, space_id)
         if new_refresh_token:

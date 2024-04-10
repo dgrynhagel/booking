@@ -1,0 +1,8 @@
+Booking for 2024-07-02 16:56:00.816726
+
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
+
+Refresh token for account marcin.debiec@fiserv.com succeed
+Booking successful for space ID 195463 - marcin.debiec@fiserv.com
+
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one

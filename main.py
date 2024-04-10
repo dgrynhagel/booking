@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, send_file
+from datetime import datetime, timedelta
 import os
 import json
 import schedule
@@ -11,6 +12,25 @@ app = Flask(__name__)
 
 DATA_DIR = "data"
 MAX_RECORDS = 5
+
+logs_dir = './logs.txt'
+
+
+def override_log(text):
+    lines = []
+    # Open the file in read mode
+    with open(logs_dir, 'r') as file:
+        # Read all lines from the file
+        lines = file.readlines()
+
+    # Get the last 30 lines using negative indexing
+    last_50_lines = lines[-50:]
+
+    # Open the file in write mode and overwrite its content with the last 50 lines
+    with open(logs_dir, 'w') as file:
+        file.writelines(last_50_lines)
+        file.write(f"{text}\n")
+
 
 # Define the function to execute booking.py for each JSON file
 def execute_booking_script(email, refresh_token, space_id, data_path):
@@ -27,6 +47,7 @@ def execute_booking_script(email, refresh_token, space_id, data_path):
 
 # Schedule the execution of booking.py for each JSON file once a day at 00:01
 def read_and_process_files():
+    override_log(f"Booking for {datetime.now() + timedelta(days=82, hours=8)}")
     files = os.listdir(DATA_DIR)
     for file in files:
         file_path = os.path.join(DATA_DIR, file)
@@ -96,14 +117,19 @@ def index():
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
 
-    files = os.listdir(DATA_DIR)
+    json_files = os.listdir(DATA_DIR)
+
     records = []
-    for file in files:
+    for file in json_files:
         with open(os.path.join(DATA_DIR, file)) as f:
             record = json.load(f)
             records.append(record)
 
-    return render_template('index.html', records=records)
+    logs = ''
+    with open(logs_dir, 'r') as f:
+        logs = f.read()
+
+    return render_template('index.html', records=records, logs=logs)
 
 
 @app.route('/save', methods=['POST'])
@@ -131,12 +157,14 @@ def remove_record():
         else:
             return jsonify({'error': 'Record not found'}), 404
 
+
 @app.route('/source')
 def download_source():
     try:
         return send_file('additional/source.zip', as_attachment=True)
     except Exception as e:
         return str(e)
+
 
 @app.route('/program')
 def download_program():
@@ -145,6 +173,8 @@ def download_program():
     except Exception as e:
         return str(e)
 
+
 if __name__ == "__main__":
     from waitress import serve
+
     serve(app, host="0.0.0.0", port=port)
