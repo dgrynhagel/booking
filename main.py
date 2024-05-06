@@ -11,7 +11,7 @@ port = 7171
 app = Flask(__name__)
 
 DATA_DIR = "data"
-MAX_RECORDS = 5
+MAX_RECORDS = 6
 
 logs_dir = './logs.txt'
 
@@ -35,7 +35,7 @@ def override_log(text):
 # Define the function to execute booking.py for each JSON file
 def execute_booking_script(email, refresh_token, space_id, data_path):
     script_path = os.path.join(os.path.dirname(__file__), "additional/booking.py")
-    process = subprocess.Popen(["python", script_path, email, refresh_token, space_id, data_path],
+    process = subprocess.Popen(["python3", script_path, email, refresh_token, space_id, data_path],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
 
@@ -47,7 +47,7 @@ def execute_booking_script(email, refresh_token, space_id, data_path):
 
 # Schedule the execution of booking.py for each JSON file once a day at 00:01
 def read_and_process_files():
-    override_log(f"Booking for {datetime.now() + timedelta(days=82, hours=8)}")
+    override_log(f"\n======================================\nBooking for {datetime.now() + timedelta(days=83, hours=7)}")
     files = os.listdir(DATA_DIR)
     for file in files:
         file_path = os.path.join(DATA_DIR, file)
@@ -111,9 +111,27 @@ def update_data(data):
         return jsonify({'message': 'Data updated successfully'})
     return jsonify({'error': 'Record not found'}), 404
 
-
 @app.route('/')
 def index():
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+
+    json_files = os.listdir(DATA_DIR)
+
+    records = []
+    for file in json_files:
+        with open(os.path.join(DATA_DIR, file)) as f:
+            record = json.load(f)
+            records.append(record)
+
+    logs = ''
+    with open(logs_dir, 'r') as f:
+        logs = f.read()
+
+    return render_template('booking.html', records=records, logs=logs)
+
+@app.route('/old')
+def index2():
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
 
@@ -175,6 +193,6 @@ def download_program():
 
 
 if __name__ == "__main__":
-    from waitress import serve
+   # from waitress import serve
 
-    serve(app, host="0.0.0.0", port=port)
+    app.run(debug=True, host="0.0.0.0", port=port)

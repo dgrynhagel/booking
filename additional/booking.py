@@ -45,7 +45,7 @@ def obtain_auth_token(refresh_token, email):
 
 
 def process_booking(email, auth_token, space_id):
-    start_date = datetime.now() + timedelta(days=82, hours=8)  # Example: Use current date and time
+    start_date = datetime.now() + timedelta(days=83, hours=5)  # Example: Use current date and time
     excluded_days = [False, False, False, False, False, True, True]
 
     def is_excluded_day(day):
@@ -76,7 +76,7 @@ def process_booking(email, auth_token, space_id):
         return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     start_time_utc = start_date.astimezone(timezone.utc)
-    end_time_utc = (start_date + timedelta(hours=10)).astimezone(timezone.utc)
+    end_time_utc = (start_date + timedelta(hours=12)).astimezone(timezone.utc)
 
     data = {
         'start': iso_format(start_time_utc),

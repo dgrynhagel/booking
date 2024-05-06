@@ -1,8 +1,68 @@
-Booking for 2024-07-02 16:56:00.816726
+
+======================================
+Booking for 2024-07-24 07:08:51.625801
+
+
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
+
+
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+
+
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+
+
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one
+
+
+Refresh token for account  failed - please provide new one
+Refresh token for account  failed - please provide new one
+
+======================================
+Booking for 2024-07-25 07:08:24.347124
+
+
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
+
+
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+
+
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+
+
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one
+
+
+Refresh token for account  failed - please provide new one
+Refresh token for account  failed - please provide new one
+
+======================================
+Booking for 2024-07-28 07:01:43.160961
+
+
+======================================
+Booking for 2024-07-28 07:01:43.857164
 
 Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
 
-Refresh token for account marcin.debiec@fiserv.com succeed
-Booking successful for space ID 195463 - marcin.debiec@fiserv.com
+Refresh token for account lukasz.marchwinski@fiserv.com failed - please provide new one
 
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+
+Refresh token for account marcin.debiec@fiserv.com failed - please provide new one
+
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+
+Refresh token for account daniel.grynhagel@fiserv.com failed - please provide new one
+
+Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one
 Refresh token for account tomasz.sroka@fiserv.com failed - please provide new one

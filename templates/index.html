@@ -4,62 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/bootstrap.css') }}">`
+    <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
-<body>
-<h1>Scheduler fiserv.engage.spaceiq.com</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Email</th>
-        <th>Space ID</th>
-        <th>Token</th>
-        <th id="removeHeader" style="display:none;">Remove</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- Rows to display existing records -->
-    {% for record in records %}
-        <tr>
-            <td>{{ record.email }}</td>
-            <td>{{ record.space_id }}</td>
-            <td>
-                <input type="text" name="token" value="hidden" id="token{{ loop.index }}">
-                <button type="button"
-                        onclick="updateToken('{{ record.email }}', '{{ record.space_id }}', document.getElementById('token{{ loop.index }}').value)">
-                    Edit
-                </button>
-            </td>
-            <td id="removeButton{{ loop.index }}" style="display:none;">
-                <button type="button" onclick="removeRecord('{{ record.email }}', '{{ record.space_id }}')">Remove
-                </button>
-            </td>
-        </tr>
-    {% endfor %}
-    <!-- Last row for adding new record -->
-    <tr class="submit-form">
-        <td><input type="text" name="email"></td>
-        <td><input type="text" name="space_id"></td>
-        <td><input type="text" name="token"></td>
-        <td>
-            <button type="button" onclick="submitForm()">Submit</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<style>
+    .jumbotron {
+      background-color: #f4511e; /* Orange */
+      color: #ffffff;
+      padding: 100px 25px;
+    }
+    .container-fluid {
+      padding: 60px 50px;
+    }
+    .logo-small {
+        color: #f4511e;
+        font-size: 50px;
+        }
 
+        .logo {
+        color: #f4511e;
+        font-size: 200px;
+       }
+    </style>
+<body>
+    <div class="jumbotron">
+    <div class="jumbotron text-center">
+    <h1>Scheduler <br>fiserv.engage.spaceiq.com </h1>
+    </div>
+    <div class="container">
+    <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Space ID</th>
+                    <th>Refresh Token</th>
+                    <th id="removeHeader">Remove</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Rows to display existing records -->
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.email }}</td>
+                        <td>{{ record.space_id }}</td>
+                        <td>
+                            <form class="form-inline">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                <input type="password" class="form-control" name="token" value="hidden" id="token{{ loop.index }}" placeholder="Token">
+                                <button type="button" class="btn btn-danger"
+                                        onclick="updateToken('{{ record.email }}', '{{ record.space_id }}', document.getElementById('token{{ loop.index }}').value)">
+                                    Edit
+                                </button>
+                            </div>
+                        </form>
+
+                        </td>
+                      
+                    </tr>
+                {% endfor %}
+                <!-- Last row for adding new record -->
+                <tr class="submit-form">
+                    <td><input type="text" name="email"></td>
+                    <td><input type="text" name="space_id"></td>
+                    <td><input type="text" name="token"></td>
+                    <td>
+                        <button type="button" class="btn btn-success" onclick="submitForm()">Submit</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+    </div>
 <p>
     <span>Contact: <a href="mailto:marcin.debiec@fiserv.com">Dębiec</a> </span>
     <br>
-    <span>Program: <a href="/program">booking-tool.zip</a> </span>
+    <span>Program and manual: <a href="/program">booking-tool.zip</a> </span>
 </p>
 
-<p>
-    <span>Logs:</span>
-    <br>
-    <br>
+<a href="#logs" class="btn btn-info" data-toggle="collapse">Logs</a>
+<div id="logs" class="collapse">
     <span style="white-space: pre; font-size: 13px; font-style: italic;">{{ logs }}</span>
-</p>
-
+</div>
+    
+</div>
 <script>
     function submitForm() {
         var email = document.querySelector(".submit-form input[name='email']").value;
@@ -108,6 +140,7 @@
             .then(data => {
                 console.log(data);
                 // Handle response if needed
+		window.location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -152,5 +185,6 @@
         }
     }
 </script>
+</div>
 </body>
 </html>
